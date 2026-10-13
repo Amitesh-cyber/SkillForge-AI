@@ -1,0 +1,56 @@
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# Package Files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Maven build directory
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+apache-maven-*/
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+bin/
+
+# Temporary / Scratch test files
+sim.txt
+TestTranscript*.java
+temp_repo/
+
+# Upgrade and migration agent logs
+.github/java-upgrade/
+.github/modernize/
+
+# Operating System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Environment and sensitive overrides
+.env
+application-local.properties

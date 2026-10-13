@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | SkillForge AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/login.css">
+</head>
+<body>
+    <div class="bg-accent bg-1"></div>
+    <div class="bg-accent bg-2"></div>
+
+    <div class="login-glass">
+        <header>
+            <h1 class="logo-title">SkillForge AI</h1>
+            <p class="subtitle" id="authSubtitle">The smarter way to master any skill.</p>
+        </header>
+
+        <a href="/oauth2/authorization/google" class="google-btn" id="googleLoginBtn" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google" width="20">
+            Continue with Google
+        </a>
+
+        <div class="separator">or use email</div>
+
+        <div id="loginError" class="login-error" style="display: none; color: #f43f5e; margin-bottom: 16px; font-size: 14px;"></div>
+
+        <form id="loginForm">
+            <div class="input-group" id="usernameGroup" style="display: none;">
+                <input type="text" id="usernameInput" placeholder="Full Name">
+                <i class="fas fa-user input-icon"></i>
+            </div>
+            
+            <div class="input-group">
+                <input type="email" id="emailInput" placeholder="Email Address" required>
+                <i class="fas fa-envelope input-icon"></i>
+            </div>
+            
+            <div class="input-group">
+                <input type="password" id="passwordInput" placeholder="Password" required>
+                <i class="fas fa-lock input-icon"></i>
+            </div>
+
+            <button type="submit" class="btn-login" id="submitBtn">Start Learning</button>
+        </form>
+
+        <p class="toggle-auth">
+            <span id="toggleText">New to SkillForge?</span> 
+            <a href="#" id="toggleAuthBtn">Create an account</a>
+        </p>
+    </div>
+
+    <script src="/js/login.js"></script>
+</body>
+</html>

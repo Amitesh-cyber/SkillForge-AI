@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillForge AI | Master Any Skill With Personalized AI Guidance</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- Marked for Markdown Support -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Chart.js for analytics dashboard -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Monaco Editor Loader -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+</head>
+<body>
+    <div class="bg-accent bg-1"></div>
+    <div class="bg-accent bg-2"></div>
+
+    <aside class="sidebar glass">
+        <div class="logo">
+            <i class="fas fa-cubes"></i>
+            <span>SkillForge AI</span>
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="#" class="nav-item active" data-view="home"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
+                <li><a href="#" class="nav-item" data-view="history"><i class="fas fa-history"></i> <span>History</span></a></li>
+                <li><a href="#" class="nav-item" data-view="saved"><i class="fas fa-bookmark"></i> <span>Saved Library</span></a></li>
+                <li><a href="#" class="nav-item" data-view="settings"><i class="fas fa-user-circle"></i> <span>My Profile</span></a></li>
+                <li><a href="#" class="nav-item" data-view="interview"><i class="fas fa-graduation-cap"></i> <span>Interview Simulator</span></a></li>
+            </ul>
+        </nav>
+        <div style="margin-top: auto;">
+            <a href="#" id="logoutBtn" class="nav-item"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+        </div>
+    </aside>
+
+    <header class="top-nav">
+        <div class="top-actions">
+            <div class="notification-bell glass" id="notificationBell">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge">3</span>
+                <div class="notification-dropdown glass">
+                    <p style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">Notifications</p>
+                    <div style="font-size: 12px; color: var(--text-dim);">
+                        <p style="padding: 8px 0; border-bottom: 1px solid #eee;">Welcome to SkillForge AI! 👋</p>
+                        <p style="padding: 8px 0;">New: AI Assistant is now available! 🤖</p>
+                    </div>
+                </div>
+            </div>
+            <div class="user-pill glass" id="userPill">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Skill" alt="User">
+                <span id="navUsername">Learner</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- Home View -->
+        <div id="homeView" class="view">
+            <header class="hero">
+                <div class="promo-badge">
+                    <i class="fas fa-sparkles"></i> 
+                    <span>AI-Powered Personal Mentor</span>
+                </div>
+                <h1>Master Any Skill With<br>Personalized AI Guidance</h1>
+                <p>Build your career with tailored roadmaps, curated industry resources, and 24/7 AI-driven assistance.</p>
+            </header>
+
+            <section class="search-container">
+                <form id="searchForm">
+                    <div class="search-bar-wrapper glass">
+                        <i class="fas fa-search" style="margin-left: 20px; color: var(--primary);"></i>
+                        <input type="text" id="topicInput" class="search-bar" placeholder="What do you want to learn today?" required>
+                        <select id="levelInput" class="glass" style="margin-right: 10px; padding: 10px; border: none; outline: none; font-weight: 600;">
+                            <option value="Beginner">Beginner</option>
+                            <option value="Intermediate">Intermediate</option>
+                            <option value="Advanced">Advanced</option>
+                        </select>
+                        <button type="submit" class="btn-primary-action">Start Path</button>
+                    </div>
+                </form>
+            </section>
+
+            <div id="loader" class="ai-loader" style="display: none; flex-direction: column; align-items: center; gap: 20px;">
+                <div class="spinner glass" style="width: 50px; height: 50px; border: 4px solid var(--primary); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                <p style="font-weight: 700; color: var(--primary);">Forging your personalized roadmap...</p>
+            </div>
+
+            <div id="resultsContainer" style="display: none;">
+                <h2 class="section-title" id="roadmapTitle" style="margin-bottom: 40px; font-size: 28px;">Learning Path</h2>
+                <div id="roadmapContent" class="roadmap-container"></div>
+
+                <h2 class="section-title" style="margin: 60px 0 30px;">Premium Resources & Courses</h2>
+                <div id="webResourcesGrid" class="resource-grid-small"></div>
+
+                <h2 class="section-title" style="margin: 60px 0 30px;">Hands-on Practice</h2>
+                <div id="practiceGrid" class="resource-grid-small"></div>
+
+                <h2 class="section-title" style="margin: 60px 0 30px;">Deep Dive Videos</h2>
+                <div id="videosGrid" class="video-grid"></div>
+            </div>
+        </div>
+
+        <!-- History View -->
+        <div id="historyView" class="view" style="display: none;">
+            <h2 class="section-title" style="margin-bottom: 40px;">Learning History</h2>
+            <div id="historyList" class="history-grid"></div>
+        </div>
+
+        <!-- Saved View -->
+        <div id="savedView" class="view" style="display: none;">
+            <h2 class="section-title" style="margin-bottom: 40px;">My Saved Library</h2>
+            <div id="savedGrid" class="video-grid"></div>
+        </div>
+
+        <!-- Settings/Profile View -->
+        <div id="settingsView" class="view" style="display: none;">
+            <h2 class="section-title" style="margin-bottom: 40px;">My Profile Dashboard</h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px;">
+                <!-- Profile Left Column -->
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <div class="glass" style="padding: 40px; text-align: center;">
+                        <div style="width: 100px; height: 100px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; margin: 0 auto 20px;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h3 id="profileName" style="font-size: 22px;">User</h3>
+                        <p id="profileEmail" style="color: var(--text-dim); margin-bottom: 20px;"></p>
+                        
+                        <div class="theme-toggle-container glass" style="padding: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <span>Dark Mode</span>
+                            <div class="toggle-switch" id="themeToggle"></div>
+                        </div>
+                        <button class="btn-primary-action" style="width: 100%;">Edit Profile</button>
+                    </div>
+
+                    <div class="glass" style="padding: 20px;">
+                        <h4 style="margin-bottom: 15px; text-align: center;"><i class="fas fa-chart-radar" style="color: var(--primary);"></i> Skill Profile</h4>
+                        <div style="position: relative; height: 250px; width: 100%;">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Right Column: Stats & History -->
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                        <div class="glass stat-card" style="padding: 20px; text-align: center;">
+                            <h2 id="statAvgScore" style="color: var(--primary); font-size: 32px;">--</h2>
+                            <p style="font-size: 13px; color: var(--text-dim);">Avg Score</p>
+                        </div>
+                        <div class="glass stat-card" style="padding: 20px; text-align: center;">
+                            <h2 id="statTotalInterviews" style="color: var(--accent); font-size: 32px;">0</h2>
+                            <p style="font-size: 13px; color: var(--text-dim);">Interviews</p>
+                        </div>
+                        <div class="glass stat-card" style="padding: 20px; text-align: center;">
+                            <h2 id="statAptitude" style="color: #4CAF50; font-size: 32px;">--</h2>
+                            <p style="font-size: 13px; color: var(--text-dim);">Aptitude Avg</p>
+                        </div>
+                    </div>
+
+                    <div class="glass" style="padding: 30px; flex: 1;">
+                        <h3 style="margin-bottom: 20px; font-size: 18px;">Recent Interview Submissions</h3>
+                        <div style="overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                                <thead>
+                                    <tr style="border-bottom: 1px solid var(--glass-border); color: var(--text-dim);">
+                                        <th style="padding: 10px;">Date</th>
+                                        <th style="padding: 10px;">Company</th>
+                                        <th style="padding: 10px;">Mode</th>
+                                        <th style="padding: 10px;">Score</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="profileHistoryTable">
+                                    <tr><td colspan="4" style="padding: 20px; text-align: center; color: var(--text-dim);">No interviews taken yet.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interview View -->
+        <div id="interviewView" class="view" style="display: none;">
+            <div id="interviewHub">
+                <header class="hero">
+                    <div class="promo-badge">
+                        <i class="fas fa-graduation-cap"></i> 
+                        <span>Premium Mode Upgrade</span>
+                    </div>
+                    <h1>SkillForge AI Interview Simulator</h1>
+                    <p>Experience realistic, stateful engineering rounds modeled on Google, Microsoft, and Amazon bars.</p>
+                </header>
+
+                <section class="setup-grid">
+                    <!-- Target Company -->
+                    <div class="glass setup-card" style="padding: 30px; margin-bottom: 30px;">
+                        <h3 style="margin-bottom: 20px; font-size: 20px;"><i class="fas fa-building" style="color: var(--primary);"></i> Select Target Company Personality</h3>
+                        <div class="company-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
+                            <div class="company-card glass active" data-company="Google">
+                                <i class="fab fa-google" style="color: #4285F4; font-size: 24px;"></i>
+                                <h4>Google</h4>
+                                <p>Algorithmic rigor & system complexity</p>
+                            </div>
+                            <div class="company-card glass" data-company="Microsoft">
+                                <i class="fab fa-windows" style="color: #00A4EF; font-size: 24px;"></i>
+                                <h4>Microsoft</h4>
+                                <p>Clean architectures & patterns</p>
+                            </div>
+                            <div class="company-card glass" data-company="Amazon">
+                                <i class="fab fa-aws" style="color: #FF9900; font-size: 24px;"></i>
+                                <h4>Amazon</h4>
+                                <p>Operational scale & LPs</p>
+                            </div>
+                            <div class="company-card glass" data-company="TCS">
+                                <i class="fas fa-building" style="color: #004D99; font-size: 24px;"></i>
+                                <h4>TCS</h4>
+                                <p>Core Java & standard problem solving</p>
+                            </div>
+                            <div class="company-card glass" data-company="Infosys">
+                                <i class="fas fa-building" style="color: #007CC3; font-size: 24px;"></i>
+                                <h4>Infosys</h4>
+                                <p>Aptitude and foundational concepts</p>
+                            </div>
+                            <div class="company-card glass" data-company="Wipro">
+                                <i class="fas fa-building" style="color: #2F9AD6; font-size: 24px;"></i>
+                                <h4>Wipro</h4>
+                                <p>Logic and behavioral assessments</p>
+                            </div>
+                            <div class="company-card glass" data-company="Flipkart">
+                                <i class="fas fa-shopping-cart" style="color: #F8E831; font-size: 24px;"></i>
+                                <h4>Flipkart</h4>
+                                <p>E-commerce scale & intense DSA</p>
+                            </div>
+                            <div class="company-card glass" data-company="Zomato">
+                                <i class="fas fa-utensils" style="color: #E23744; font-size: 24px;"></i>
+                                <h4>Zomato</h4>
+                                <p>Agility & rapid shipping logic</p>
+                            </div>
+                            <div class="company-card glass" data-company="Startup">
+                                <i class="fas fa-rocket" style="color: #a855f7; font-size: 24px;"></i>
+                                <h4>Tech Startup</h4>
+                                <p>Practical shipping & agility</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Choose Mode -->
+                    <div class="glass setup-card" style="padding: 30px; margin-bottom: 30px;">
+                        <h3 style="margin-bottom: 20px; font-size: 20px;"><i class="fas fa-tools" style="color: var(--primary);"></i> Choose Interview Mode</h3>
+                        <div class="mode-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;">
+                            <div class="mode-card glass active" data-mode="PROJECT">
+                                <i class="fas fa-folder-open" style="font-size: 22px;"></i>
+                                <h4>Project Interview</h4>
+                                <p>Deep architectural grilling on your project stack</p>
+                            </div>
+                            <div class="mode-card glass" data-mode="DEBUGGING">
+                                <i class="fas fa-bug" style="font-size: 22px;"></i>
+                                <h4>Debugging Round</h4>
+                                <p>Spot and patch real-world bugs in dynamic logs</p>
+                            </div>
+                            <div class="mode-card glass" data-mode="DSA">
+                                <i class="fas fa-project-diagram" style="font-size: 22px;"></i>
+                                <h4>DSA Interview</h4>
+                                <p>Data structures, logic, and complexity analysis</p>
+                            </div>
+                            <div class="mode-card glass" data-mode="HR">
+                                <i class="fas fa-user-tie" style="font-size: 22px;"></i>
+                                <h4>HR Round</h4>
+                                <p>Behavioral focus & cultural matching assessment</p>
+                            </div>
+                            <div class="mode-card glass" data-mode="CODING">
+                                <i class="fas fa-code" style="font-size: 22px;"></i>
+                                <h4>Coding Assessment</h4>
+                                <p>General clean code, concurrency, and OOP testing</p>
+                            </div>
+                            <div class="mode-card glass" data-mode="APTITUDE">
+                                <i class="fas fa-brain" style="font-size: 22px;"></i>
+                                <h4>Aptitude Test</h4>
+                                <p>Logical questions & puzzles under strict timer</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project Metadata Form -->
+                    <div id="projectSetupForm" class="glass setup-card" style="padding: 30px; margin-bottom: 30px;">
+                        <h3 style="margin-bottom: 20px; font-size: 20px;"><i class="fas fa-file-code" style="color: var(--primary);"></i> Project Details Blueprint</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div style="display: flex; flex-direction: column; gap: 15px;">
+                                <div>
+                                    <label style="font-weight: 600; font-size: 13px;">Project Title</label>
+                                    <input type="text" id="simProjTitle" class="glass" style="width:100%; padding:12px; border:1px solid var(--glass-border); border-radius:10px; margin-top:5px; background: transparent; color: var(--text-main);" value="SkillForge AI Premium Dashboard">
+                                </div>
+                                <div>
+                                    <label style="font-weight: 600; font-size: 13px;">Tech Stack (Comma Separated)</label>
+                                    <input type="text" id="simProjStack" class="glass" style="width:100%; padding:12px; border:1px solid var(--glass-border); border-radius:10px; margin-top:5px; background: transparent; color: var(--text-main);" value="Java, Spring Boot, PostgreSQL, Redis, React">
+                                </div>
+                                <div>
+                                    <label style="font-weight: 600; font-size: 13px;">Key Features Summary</label>
+                                    <textarea id="simProjFeatures" class="glass" style="width:100%; height:80px; padding:12px; border:1px solid var(--glass-border); border-radius:10px; margin-top:5px; resize:none; background: transparent; color: var(--text-main);">OAuth2 Login, AI recommendation controller, local PostgreSQL history persistence, marked summary conversions.</textarea>
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 15px;">
+                                <div>
+                                    <label style="font-weight: 600; font-size: 13px;">Project Short Description</label>
+                                    <textarea id="simProjDesc" class="glass" style="width:100%; height:75px; padding:12px; border:1px solid var(--glass-border); border-radius:10px; margin-top:5px; resize:none; background: transparent; color: var(--text-main);">A comprehensive premium learning path architect and dynamic content recommendation server leveraging generative models.</textarea>
+                                </div>
+                                <div>
+                                    <label style="font-weight: 600; font-size: 13px;">Architecture Explanation (API / Database flow)</label>
+                                    <textarea id="simProjArch" class="glass" style="width:100%; height:110px; padding:12px; border:1px solid var(--glass-border); border-radius:10px; margin-top:5px; resize:none; background: transparent; color: var(--text-main);">REST APIs managed by Spring Security. Database requests stored via standard Hibernate JPA repositories in PostgreSQL. External content queried asynchronously using RestTemplate clients.</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="startInterviewBtn" class="btn-primary-action" style="width: 100%; padding: 20px; font-size: 18px; border-radius: 16px;"><i class="fas fa-play"></i> Initialize Immersive Interview Session</button>
+                </section>
+            </div>
+
+            <!-- IMMERSIVE SPLIT SCREEN simulator -->
+            <div id="immersiveSimulator" class="simulator-overlay glass" style="display: none;">
+                <div class="sim-container" style="display: flex; height: 100vh; gap: 20px; padding: 20px;">
+                    <!-- LEFT SIDE: AI INTERVIEWER -->
+                    <div class="sim-left glass" style="flex: 1; display: flex; flex-direction: column; padding: 20px; overflow: hidden; height: calc(100vh - 40px);">
+                        <div class="sim-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <div class="sim-meta" style="display: flex; gap: 10px;">
+                                <span class="glass" id="simCompanyBadge" style="padding: 5px 12px; font-size: 11px; font-weight: 800; border-radius: 6px; text-transform: uppercase;">GOOGLE</span>
+                                <span class="glass" id="simModeBadge" style="padding: 5px 12px; font-size: 11px; font-weight: 800; border-radius: 6px; text-transform: uppercase; background: var(--primary-glow); color: white;">DSA ROUND</span>
+                            </div>
+                            <div class="sim-timer" id="simTimer" style="font-weight: 700; font-size: 16px;"><i class="far fa-clock"></i> 00:00</div>
+                        </div>
+
+                        <div class="avatar-container glass" style="display: flex; align-items: center; gap: 15px; padding: 15px; margin-bottom: 20px;">
+                            <div class="avatar-circle" style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; position: relative;">
+                                <div class="avatar-face" id="avatarFace" style="font-size: 24px; color: white;"><i class="fas fa-user-astronaut"></i></div>
+                                <div class="speaking-waves" id="speakingWaves" style="position: absolute; display: none; gap: 3px;">
+                                    <span style="width:3px; height:8px; background:white; display:block; animation: wave 0.8s ease-in-out infinite;"></span>
+                                    <span style="width:3px; height:15px; background:white; display:block; animation: wave 0.8s ease-in-out infinite 0.2s;"></span>
+                                    <span style="width:3px; height:10px; background:white; display:block; animation: wave 0.8s ease-in-out infinite 0.4s;"></span>
+                                </div>
+                            </div>
+                            <div class="interviewer-title">
+                                <h4 id="interviewerName" style="font-size: 16px; margin: 0;">AI Technical Lead</h4>
+                                <p id="interviewerRole" style="font-size: 11px; color: var(--text-dim); margin: 0;">Hiring Bar Raiser</p>
+                            </div>
+                        </div>
+
+                        <!-- Dialogue Messages -->
+                        <div class="sim-chat-area" id="simChatMessages" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; padding: 10px; background: rgba(0,0,0,0.02); border-radius: 12px; margin-bottom: 20px;">
+                            <!-- Dynamically populated -->
+                        </div>
+
+                        <div class="sim-chat-input-row" style="display: flex; gap: 10px; margin-bottom: 15px;">
+                            <textarea id="simChatInput" placeholder="Explain your approach verbally here or answer follow-ups..." style="flex: 1; height: 54px; padding: 12px; border-radius: 12px; border: 1px solid var(--glass-border); resize: none; outline: none; background: transparent; color: var(--text-main); font-size: 13px;"></textarea>
+                            <button id="simSendChat" style="width: 54px; height: 54px; border-radius: 12px; border: none; background: var(--primary); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px;"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+
+                        <div class="sim-action-row" style="display: flex; gap: 10px;">
+                            <button id="voiceModeBtn" class="glass" style="flex: 1; padding: 12px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--text-main);"><i class="fas fa-microphone-slash"></i> Enable Voice Mode</button>
+                            <button id="endSessionBtn" class="btn-accent-sim" style="flex: 1; padding: 12px; border: none; border-radius: 12px; background: var(--accent); color: white; font-weight: 700; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 8px;"><i class="fas fa-door-open"></i> End & Analyze</button>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT SIDE: TABBED WORKSPACE -->
+                    <div id="codingWorkspace" class="sim-right sim-workspace glass" style="flex: 1; display: flex; flex-direction: column; padding: 20px; overflow: hidden; height: calc(100vh - 40px);">
+                        <div class="tab-header" style="display: flex; gap: 10px; margin-bottom: 15px;">
+                            <button class="workspace-tab active glass" data-tab="editor-tab" style="padding: 10px 18px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 13px;"><i class="fas fa-code"></i> Live Editor</button>
+                            <button class="workspace-tab glass" data-tab="canvas-tab" style="padding: 10px 18px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 13px;"><i class="fas fa-paint-brush"></i> Drawing Canvas</button>
+                            <button class="workspace-tab glass" data-tab="notepad-tab" style="padding: 10px 18px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 13px;"><i class="fas fa-file-alt"></i> Notes</button>
+                        </div>
+
+                        <div class="workspace-content" style="flex: 1; overflow: hidden; display: flex; flex-direction: column;">
+                            <!-- Live Editor Tab -->
+                            <div id="editor-tab" class="tab-pane active" style="display: flex; flex-direction: column; height: 100%;">
+                                <div class="editor-toolbar" style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
+                                    <select id="editorLanguage" class="glass" style="padding: 8px 12px; border: none; border-radius: 8px; font-weight: 700; outline: none;">
+                                        <option value="javascript">JavaScript</option>
+                                        <option value="python">Python</option>
+                                        <option value="java">Java</option>
+                                        <option value="cpp">C++</option>
+                                    </select>
+                                    <div style="margin-left: auto; display: flex; gap: 10px;">
+                                        <button id="runCodeBtn" style="padding: 8px 16px; border: none; border-radius: 8px; background: rgba(16,185,129,0.1); border: 1px solid #10b981; color: #10b981; font-weight: 700; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 5px;"><i class="fas fa-play"></i> Run Code</button>
+                                        <button id="submitCodeBtn" style="padding: 8px 16px; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: 700; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 5px;"><i class="fas fa-cloud-upload-alt"></i> Submit</button>
+                                    </div>
+                                </div>
+                                <div id="monacoEditorContainer" style="flex: 1; border-radius: 12px; overflow: hidden; border: 1px solid var(--glass-border); min-height: 200px; margin-bottom: 15px;"></div>
+                                
+                                <!-- Console Terminal -->
+                                <div class="terminal-panel glass" style="height: 140px; display: flex; flex-direction: column; overflow: hidden; padding: 12px;">
+                                    <div class="terminal-header" style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 800; color: var(--text-dim); margin-bottom: 8px; border-bottom: 1px solid var(--glass-border); padding-bottom: 5px;">
+                                        <span><i class="fas fa-terminal"></i> CONSOLE OUTPUT</span>
+                                        <button id="clearTerminalBtn" style="background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 11px;"><i class="fas fa-ban"></i> Clear</button>
+                                    </div>
+                                    <pre class="terminal-output" id="terminalOutput" style="flex: 1; overflow-y: auto; font-family: monospace; font-size: 12px; color: #10b981; margin: 0; line-height: 1.4;">Terminal initialized. Select language and click 'Run Code' to execute.</pre>
+                                </div>
+                            </div>
+
+                            <!-- Drawing Canvas Tab -->
+                            <div id="canvas-tab" class="tab-pane" style="display: none; flex-direction: column; height: 100%;">
+                                <div class="canvas-toolbar" style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
+                                    <button class="tool-btn active glass" data-tool="pencil" style="padding: 6px 12px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 12px;"><i class="fas fa-pencil-alt"></i> Pencil</button>
+                                    <button class="tool-btn glass" data-tool="rectangle" style="padding: 6px 12px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 12px;"><i class="far fa-square"></i> Rect</button>
+                                    <input type="color" id="canvasColor" value="#6366f1" style="width: 30px; height: 30px; border: none; border-radius: 50%; cursor: pointer;">
+                                    <button id="clearCanvasBtn" style="margin-left: auto; padding: 6px 12px; border: none; border-radius: 6px; background: rgba(244,63,94,0.1); border: 1px solid var(--accent); color: var(--accent); font-weight: 600; cursor: pointer; font-size: 12px;"><i class="fas fa-trash-alt"></i> Clear</button>
+                                </div>
+                                <div class="canvas-wrapper" style="flex: 1; border: 1px dashed var(--glass-border); border-radius: 12px; background: rgba(0,0,0,0.01); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
+                                    <canvas id="designCanvas" width="600" height="400" style="background: white; border-radius: 8px; cursor: crosshair; box-shadow: var(--shadow-soft);"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- Architectural Specs Tab -->
+                            <div id="notepad-tab" class="tab-pane" style="display: none; height: 100%;">
+                                <textarea id="notepadTextarea" class="glass text-notepad" placeholder="Write down system design layouts, architectural logic blueprints, microservices nodes, database structure, or API details..." style="width: 100%; height: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--glass-border); background: transparent; color: var(--text-main); font-size: 14px; font-family: monospace; resize: none; outline: none; line-height: 1.6;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- HR WORKSPACE -->
+                    <div id="hrWorkspace" class="sim-right glass" style="flex: 1; display: none; flex-direction: column; padding: 40px; align-items: center; justify-content: center; height: calc(100vh - 40px);">
+                        <div style="text-align: center; max-width: 500px;">
+                            <div style="font-size: 80px; color: var(--primary); margin-bottom: 20px;">
+                                <i class="fas fa-users-viewfinder"></i>
+                            </div>
+                            <h2 style="margin-bottom: 15px;">Behavioral & Cultural Fit</h2>
+                            <p style="color: var(--text-dim); line-height: 1.6; margin-bottom: 30px;">
+                                You are currently in the HR/Behavioral round. There is no coding editor for this section. Please listen to the interviewer and respond verbally using the "Enable Voice Mode" button or type your responses in the chat.
+                            </p>
+                            <div class="glass" style="padding: 20px; text-align: left; border-left: 4px solid var(--primary);">
+                                <h4 style="margin-bottom: 10px;"><i class="fas fa-lightbulb"></i> Tips for Success:</h4>
+                                <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; color: var(--text-dim); font-size: 13px;">
+                                    <li>- Use the STAR method (Situation, Task, Action, Result).</li>
+                                    <li>- Focus on teamwork, leadership, and conflict resolution.</li>
+                                    <li>- Be authentic and align with the company's core values.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- APTITUDE WORKSPACE -->
+                    <div id="aptitudeWorkspace" class="sim-right" style="flex: 1; display: none; flex-direction: row; gap: 20px; height: calc(100vh - 40px); background: transparent;">
+                        
+                        <!-- Main Panel -->
+                        <div class="glass" style="flex: 1; padding: 30px; display: flex; flex-direction: column; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); background: rgba(20, 25, 35, 0.8);">
+                            
+                            <!-- Header -->
+                            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 25px;">
+                                <h2 id="aptSectionTitle" style="font-size: 22px; letter-spacing: 1px; color: #f1f5f9; text-transform: uppercase;">SECTION 3: SPATIAL REASONING</h2>
+                                <div style="font-size: 15px; color: #cbd5e1;"><span style="color: #f97316; font-weight: 600;">24:18</span> REMAINING</div>
+                            </div>
+                            
+                            <div style="display: flex; flex: 1; gap: 30px;">
+                                <!-- Left Image Box -->
+                                <div class="glass" style="flex: 1; border-radius: 12px; background: rgba(30, 40, 55, 0.4); display: flex; align-items: center; justify-content: center; padding: 20px; border: 1px solid rgba(255,255,255,0.05);">
+                                    <div id="aptQuestionVisual" style="width: 100%; height: 100%; min-height: 300px; display: flex; align-items: center; justify-content: center;">
+                                        <!-- Visual placeholder -->
+                                        <i class="fas fa-cube" style="font-size: 150px; color: #3b82f6; opacity: 0.6; filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.5));"></i>
+                                    </div>
+                                </div>
+                                
+                                <!-- Right Options Area -->
+                                <div style="flex: 1; display: flex; flex-direction: column;">
+                                    <p id="aptQuestionText" style="font-size: 15px; line-height: 1.6; color: #e2e8f0; margin-bottom: 25px;">
+                                        Loading question...
+                                    </p>
+                                    
+                                    <div id="aptOptionsGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; flex: 1;">
+                                        <!-- Options injected via JS -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Controls -->
+                            <div style="display: flex; justify-content: space-between; margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                                <button id="aptPrevBtn" class="glass" style="padding: 12px 25px; border: none; border-radius: 8px; color: #cbd5e1; cursor: pointer; font-weight: 600;">Previous</button>
+                                <button id="aptNextBtn" class="btn-primary-action" style="padding: 12px 30px; border-radius: 8px; background: #3b82f6; border: none; color: white; font-weight: 600; cursor: pointer;">Next Question</button>
+                            </div>
+                        </div>
+
+                        <!-- Right Sidebar -->
+                        <div style="width: 300px; display: flex; flex-direction: column; gap: 20px;">
+                            <!-- Progress Card -->
+                            <div class="glass" style="padding: 25px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); background: rgba(20, 25, 35, 0.8);">
+                                <div style="font-size: 14px; color: #f1f5f9; margin-bottom: 15px; letter-spacing: 1px;" id="aptProgressText">QUESTION 14 OF 20</div>
+                                <div id="aptDotsGrid" style="display: grid; grid-template-columns: repeat(10, 1fr); gap: 8px;">
+                                    <!-- Dots injected via JS -->
+                                </div>
+                            </div>
+                            
+                            <!-- Navigator Card -->
+                            <div class="glass" style="flex: 1; padding: 25px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); background: rgba(20, 25, 35, 0.8);">
+                                <div style="font-size: 14px; color: #f1f5f9; margin-bottom: 25px; letter-spacing: 1px;">TEST NAVIGATOR</div>
+                                <div style="display: flex; flex-direction: column; gap: 20px; font-size: 14px;">
+                                    <div style="padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #64748b;">SECTION 1 (VERBAL)</div>
+                                    <div style="padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #64748b;">SECTION 2 (MATH)</div>
+                                    <div style="padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #3b82f6; display: flex; justify-content: space-between;">
+                                        <span>SECTION 3 (SPATIAL)</span>
+                                        <span style="font-size: 11px; font-weight: 600; padding-top: 2px;">ACTIVE</span>
+                                    </div>
+                                    <div style="color: #cbd5e1; display: flex; justify-content: space-between;">
+                                        <span>SECTION 4 (LOGIC)</span>
+                                        <i class="fas fa-chevron-up" style="color: #94a3b8; font-size: 12px; margin-top: 3px;"></i>
+                                    </div>
+                                    
+                                    <div style="padding-left: 5px; display: flex; flex-direction: column; gap: 12px; color: #94a3b8; font-size: 13px; margin-top: -5px;">
+                                        <div><i class="fas fa-check" style="color: #3b82f6; width: 18px;"></i> 1-13 Answered</div>
+                                        <div style="color: #3b82f6;"><i class="fas fa-circle" style="font-size: 8px; width: 18px; vertical-align: middle;"></i> 14 Active</div>
+                                        <div><i class="far fa-circle" style="font-size: 10px; width: 18px;"></i> 15-20 Remaining</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button id="submitAptitudeBtn" style="padding: 18px; border: none; border-radius: 12px; font-weight: bold; background: transparent; border: 1px solid #f97316; color: #f97316; cursor: pointer; display: none; font-size: 15px;">Submit Assessment</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ANALYTICS REPORT DASHBOARD -->
+            <div id="analyticsDashboard" class="glass" style="display: none; padding: 40px; margin-top: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+                    <div>
+                        <span class="promo-badge" style="margin-bottom: 10px;"><i class="fas fa-chart-line"></i> Performance Scorecard</span>
+                        <h2 style="font-size: 32px;" id="dashboardSessionTitle">Hiring Evaluation Sheet</h2>
+                    </div>
+                    <button id="closeDashboardBtn" class="btn-primary-action"><i class="fas fa-arrow-left"></i> Return to Hub</button>
+                </div>
+
+                <div class="dashboard-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 40px; margin-bottom: 40px;">
+                    <div style="display: flex; flex-direction: column; gap: 30px;">
+                        <div class="glass" style="padding: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 20px;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 24px; font-weight: 800; color: var(--primary);" id="statTech">85%</div>
+                                <div style="font-size: 12px; color: var(--text-dim); margin-top: 5px;">Technical Skill</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 24px; font-weight: 800; color: var(--secondary);" id="statCoding">75%</div>
+                                <div style="font-size: 12px; color: var(--text-dim); margin-top: 5px;">Live Coding</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 24px; font-weight: 800; color: #10b981;" id="statDsa">80%</div>
+                                <div style="font-size: 12px; color: var(--text-dim); margin-top: 5px;">Algorithms (DSA)</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 24px; font-weight: 800; color: #f59e0b;" id="statComm">90%</div>
+                                <div style="font-size: 12px; color: var(--text-dim); margin-top: 5px;">Communication</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 24px; font-weight: 800; color: var(--accent);" id="statDebug">70%</div>
+                                <div style="font-size: 12px; color: var(--text-dim); margin-top: 5px;">Debugging</div>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                            <div class="glass" style="padding: 30px;">
+                                <h3 style="color: #10b981; margin-bottom: 20px; font-size: 18px;"><i class="fas fa-check-circle"></i> Strengths</h3>
+                                <ul id="listStrengths" style="padding-left: 20px; display: flex; flex-direction: column; gap: 10px; font-size: 14px; color: var(--text-dim);">
+                                </ul>
+                            </div>
+                            <div class="glass" style="padding: 30px;">
+                                <h3 style="color: var(--accent); margin-bottom: 20px; font-size: 18px;"><i class="fas fa-times-circle"></i> Improvement Areas</h3>
+                                <ul id="listWeaknesses" style="padding-left: 20px; display: flex; flex-direction: column; gap: 10px; font-size: 14px; color: var(--text-dim);">
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="glass" style="padding: 30px;">
+                            <h3 style="margin-bottom: 15px; font-size: 18px;"><i class="fas fa-info-circle" style="color: var(--primary);"></i> AI Interview Insights</h3>
+                            <p id="feedbackInsights" style="font-size: 14px; color: var(--text-dim); line-height: 1.6; margin: 0;"></p>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 30px;">
+                        <div class="glass" style="padding: 30px; text-align: center;">
+                            <div class="score-ring" style="width: 140px; height: 140px; border-radius: 50%; border: 10px solid rgba(99, 102, 241, 0.1); border-top-color: var(--primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                                <div style="font-size: 32px; font-weight: 800;" id="feedbackTotalScore">82</div>
+                            </div>
+                            <h3>Hiring Verdict</h3>
+                            <p style="font-size: 14px; color: var(--text-dim); margin-top: 10px;" id="feedbackHiringVerdict">Overall Score: 82%</p>
+                        </div>
+
+                        <div class="glass" style="padding: 30px;">
+                            <h3 style="margin-bottom: 20px; font-size: 16px;"><i class="fas fa-graduation-cap" style="color: var(--primary);"></i> Recommended Study Path</h3>
+                            <ul id="listRecommendations" style="display: flex; flex-direction: column; gap: 10px; padding-left: 20px; font-size: 13px; color: var(--text-dim);">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAST SESSIONS HUB -->
+            <div id="pastSessionsHub" style="margin-top: 50px;">
+                <h2 class="section-title" style="margin-bottom: 25px;">Session Log History</h2>
+                <div class="history-grid" id="pastSessionsGrid">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- AI Chatbot UI -->
+    <div class="chatbot-container">
+        <div class="chatbot-window glass" id="chatbotWindow">
+            <div class="chatbot-header">
+                <div class="bot-info">
+                    <div class="bot-avatar"><i class="fas fa-robot"></i></div>
+                    <div>
+                        <h4 style="margin: 0;">SkillForge Assistant</h4>
+                        <span style="font-size: 10px; opacity: 0.8;">AI Learning Tutor</span>
+                    </div>
+                </div>
+                <button id="closeChat" style="background: none; border: none; color: white; cursor: pointer;"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                    Hi! I'm your AI mentor. Ask me any doubt about your current topic or roadmap.
+                </div>
+            </div>
+            <div class="chat-modes glass" style="margin: 10px; padding: 10px; display: flex; gap: 10px; overflow-x: auto;">
+                <button class="mode-btn active" data-mode="Explain This Video">Explain This Video</button>
+                <button class="mode-btn" data-mode="Generate Notes">Generate Notes</button>
+                <button class="mode-btn" data-mode="Create Quiz">Create Quiz</button>
+                <button class="mode-btn" data-mode="Simplify Concept">Simplify Concept</button>
+                <button class="mode-btn" data-mode="Show Practical Example">Show Practical Example</button>
+                <button class="mode-btn" data-mode="Visual Flowchart">Visual Flowchart</button>
+            </div>
+            <div class="chat-input-area">
+                <textarea id="chatInput" placeholder="Ask a doubt..."></textarea>
+                <button id="sendChat"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+        <button class="chatbot-trigger" id="chatbotTrigger">
+            <i class="fas fa-comment-dots"></i>
+        </button>
+    </div>
+
+    <!-- Templates -->
+    <template id="stepTemplate">
+        <div class="roadmap-step">
+            <div class="step-node"></div>
+            <div class="step-content glass">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <span class="step-number" style="font-weight: 800; color: var(--primary);">Step 01</span>
+                    <span class="glass time-badge" style="padding: 5px 12px; font-size: 12px; font-weight: 700;">⏳ Time</span>
+                </div>
+                <h3 class="step-title" style="font-size: 20px; margin-bottom: 12px;">Step Title</h3>
+                <p class="step-explanation" style="font-size: 15px; color: var(--text-dim); margin-bottom: 25px; line-height: 1.6;">Explanation...</p>
+                
+                <div style="display: flex; gap: 15px; align-items: flex-end;">
+                    <a href="#" target="_blank" class="yt-resource-mini glass" style="flex: 1; text-decoration: none; display: flex; gap: 15px; padding: 15px; border-radius: 15px;">
+                        <img src="" class="yt-thumb-mini" style="width: 100px; border-radius: 10px;" alt="YT">
+                        <div class="yt-info-mini">
+                            <span style="font-size: 10px; font-weight: 800; opacity: 0.6; text-transform: uppercase;">Best Video</span>
+                            <h4 style="font-size: 14px; color: var(--text-main); margin-top: 5px;">Title</h4>
+                        </div>
+                    </a>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <button class="save-btn glass" style="width: 44px; height: 44px; cursor: pointer;"><i class="far fa-bookmark"></i></button>
+                        <button class="ask-bot-btn glass" style="width: 44px; height: 44px; cursor: pointer; color: var(--primary);"><i class="fas fa-robot"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="smallCardTemplate">
+        <div class="course-card glass">
+            <div class="card-icon-modern" style="width: 40px; height: 40px; background: rgba(99,102,241,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--primary);">
+                <i class="fas fa-globe"></i>
+            </div>
+            <div style="flex: 1;">
+                <h4 style="font-size: 16px; margin-bottom: 5px;">Title</h4>
+                <p style="font-size: 12px; color: var(--text-dim); margin-bottom: 15px;">Desc</p>
+                <a href="#" target="_blank" style="font-size: 13px; font-weight: 700; color: var(--primary); text-decoration: none;">Explore <i class="fas fa-chevron-right" style="font-size: 10px;"></i></a>
+            </div>
+        </div>
+    </template>
+
+    <template id="videoCardTemplate">
+        <div class="video-card glass">
+            <div class="video-thumb-container">
+                <span class="video-topic-tag topic-tag">Topic</span>
+                <img src="" class="video-thumb" alt="YT">
+                <button class="save-btn-floating glass" style="position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border-radius: 50%; cursor: pointer;"><i class="far fa-bookmark"></i></button>
+            </div>
+            <a href="#" target="_blank" class="video-link" style="text-decoration: none; color: inherit; padding: 15px; display: block;">
+                <h4 style="font-size: 14px; margin-bottom: 8px;">Title</h4>
+                <p style="font-size: 12px; color: var(--text-dim);"><i class="fab fa-youtube"></i> <span class="channel-name">Channel</span></p>
+            </a>
+        </div>
+    </template>
+
+    <style>
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+    <script src="/js/app.js?v=3"></script>
+</body>
+</html>
